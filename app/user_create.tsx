@@ -1,40 +1,82 @@
-import React, { useState } from 'react'
+import { useRouter } from 'expo-router';
+import React, { useState } from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity } from "react-native";
+import{ auth, db} from '../scripts/firebase-Config';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import {ref , set } from 'firebase/database';
 
 export default function CreateUser() {
+    const router = useRouter();
+
+    const [nome, setNome] = useState(null);
+    const [email, setEmail] = useState(null);
+    const [password, setPassword] = useState(null);
+    const [errorCreateUser, seterrorCreateUser ] = useState(null);
+
+    const validarCampos = () => {
+        if (nome == "") {
+            seterrorCreateUser("Informe um nome");
+        }else if(email == "" ) {
+            seterrorCreateUser("Informe um email");
+        }else if (password == "") {
+            seterrorCreateUser("Informe uma senha");
+        } else {
+            seterrorCreateUser(null);
+        }
+    }
+    // Função que cria usuario no FireBase
+    const createUser = ( ) => {
+        createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+            // Signed up 
+            const user = userCredential.user;
+            set(ref(db, 'users/' + user.uid),{
+                nome: nome, 
+                email: email
+            });
+            router.push('/');
+        })
+        .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            seterrorCreateUser(errorMessage);
+        });
+    }
+    
+
     return (
         <View style={styles.container}>
-            {/* {errorCreateUser != null && (
+            {errorCreateUser != null && ( 
                 <Text style={styles.alert}>{errorCreateUser}</Text>
-            )} */}
+            )}
 
             <Text style={styles.titulo}>Cadastrar Usuário</Text>
 
             <TextInput
                 style={styles.input}
                 placeholder='Nome'
-                // value={nome}
-                // onChangeText={setNome}
+                value={nome}
+                onChangeText={setNome}
             />
 
             <TextInput
                 style={styles.input}
                 placeholder='E-mail'
-                // value={email}
-                // onChangeText={setEmail}
+                value={email}
+                onChangeText={setEmail}
             />
 
             <TextInput
                 style={styles.input}
                 secureTextEntry={true}
                 placeholder='Senha'
-                // value={password}
-                // onChangeText={setPassword}
+                value={password}
+                onChangeText={setPassword}
             />
 
             <TouchableOpacity
                 style={styles.button}
-                // onPress={validate}
+                onPress={createUser}
             >
                 <Text style={styles.textButton}>Criar usuário</Text>
             </TouchableOpacity>
