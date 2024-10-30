@@ -8,10 +8,10 @@ import {ref , set } from 'firebase/database';
 export default function CreateUser() {
     const router = useRouter();
 
-    const [nome, setNome] = useState(null);
-    const [email, setEmail] = useState(null);
-    const [password, setPassword] = useState(null);
-    const [errorCreateUser, seterrorCreateUser ] = useState(null);
+    const [nome, setNome] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [errorCreateUser, seterrorCreateUser ] = useState("");
 
     const validarCampos = () => {
         if (nome == "") {
@@ -21,7 +21,8 @@ export default function CreateUser() {
         }else if (password == "") {
             seterrorCreateUser("Informe uma senha");
         } else {
-            seterrorCreateUser(null);
+            seterrorCreateUser("");
+            createUser();
         }
     }
     // Função que cria usuario no FireBase
